@@ -7,8 +7,13 @@ public struct Search {
     ///   - query: The search query.
     ///   - resolve: Whether to resolve non-local accounts.
     /// - Returns: Resource for `Results`.
-    public static func search(query: String, resolve: Bool = false) -> ResultsResource {
-        let parameters = [URLQueryItem(name: "q", value: query), URLQueryItem(name: "resolve", value: String(resolve))]
-        return ResultsResource(path: "/api/v1/search", parameters: parameters, parse: ResultsResource.parser)
+    public static func search(query: String, resolve: Bool? = nil) -> ResultsResource {
+        let parameters = [
+            Parameter(name: "q", value: query),
+            Parameter(name: "resolve", value: resolve.flatMap(nilOrTrue))
+        ]
+
+        let method = HTTPMethod.get(Payload.parameters(parameters))
+        return ResultsResource(path: "/api/v1/search", method: method, parse: ResultsResource.parser)
     }
 }

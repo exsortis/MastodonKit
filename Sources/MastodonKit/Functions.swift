@@ -6,6 +6,14 @@ func toString(scope: AccessScope) -> String {
     return scope.rawValue
 }
 
+func toArrayOfParameters<A>(withName name: String) -> (A) -> Parameter {
+    return { value in Parameter(name: "\(name)[]", value: String(describing: value)) }
+}
+
+func between(_ min: Int, and max: Int, fallback: Int) -> (Int) -> Int {
+    return { limit in (limit >= min && limit <= max) ? limit : fallback }
+}
+
 // MARK: - Flat-map
 
 func asString(json: JSONObject) -> String? {
@@ -20,16 +28,19 @@ func asJSONDictionaries(json: JSONObject) -> [JSONDictionary]? {
     return json as? [JSONDictionary]
 }
 
-func toQueryItem(key: String, value: String?) -> URLQueryItem? {
-    guard let value = value else { return nil }
-    return URLQueryItem(name: key, value: value)
-}
-
-func toURL(string: String) -> URL? {
-    return URL(string: string)
-}
-
 func toOptionalString<A>(optional: A?) -> String? {
-    guard let value = optional else { return nil }
-    return String(describing: value)
+    return optional.flatMap { String(describing: $0) }
+}
+
+func toQueryItem(parameter: Parameter) -> URLQueryItem? {
+    guard let value = parameter.value else { return nil }
+    return URLQueryItem(name: parameter.name, value: value)
+}
+
+func toString(parameter: Parameter) -> String? {
+    return parameter.value.flatMap { value in "\(parameter.name)=\(value)" }
+}
+
+func nilOrTrue(_ flag: Bool) -> String? {
+    return flag ? "true" : nil
 }

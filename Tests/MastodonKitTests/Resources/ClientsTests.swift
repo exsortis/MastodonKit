@@ -5,56 +5,64 @@ class ClientsTests: XCTestCase {
     func testRegisterApplication() {
         let resource = Clients.register(clientName: "MastodonKitTestApplication", scopes: [])
 
-        let expectedClientName = URLQueryItem(name: "client_name", value: "MastodonKitTestApplication")
-        let expectedRedirectURI = URLQueryItem(name: "redirect_uris", value: "urn:ietf:wg:oauth:2.0:oob")
-        let expectedScopes = URLQueryItem(name: "scopes", value: "")
-
+        // Endpoint
         XCTAssertEqual(resource.path, "/api/v1/apps")
-        XCTAssertEqual(resource.httpMethod, .post)
 
-        XCTAssertEqual(resource.parameters!.count, 3)
-        XCTAssertTrue(resource.parameters!.contains(expectedClientName))
-        XCTAssertTrue(resource.parameters!.contains(expectedRedirectURI))
-        XCTAssertTrue(resource.parameters!.contains(expectedScopes))
+        // Method
+        XCTAssertEqual(resource.method.name, "POST")
+        XCTAssertNil(resource.method.queryItems)
+        XCTAssertNotNil(resource.method.httpBody)
 
+        let payload = String(data: resource.method.httpBody!, encoding: .utf8)!
+        XCTAssertEqual(payload.components(separatedBy: "&").count, 3)
+        XCTAssertTrue(payload.contains("client_name=MastodonKitTestApplication"))
+        XCTAssertTrue(payload.contains("redirect_uris=urn:ietf:wg:oauth:2.0:oob"))
+        XCTAssertTrue(payload.contains("scopes="))
+
+        // Parser
         XCTAssertTrue(type(of: resource.parse) == ParserFunctionType<ClientApplication?>.self)
     }
 
     func testRegisterApplicationWithRedirectURI() {
         let resource = Clients.register(clientName: "MastodonKitTestApplication", redirectURI: "my-awesome-app://", scopes: [.read, .follow])
 
-        let expectedClientName = URLQueryItem(name: "client_name", value: "MastodonKitTestApplication")
-        let expectedRedirectURI = URLQueryItem(name: "redirect_uris", value: "my-awesome-app://")
-        let expectedScopes = URLQueryItem(name: "scopes", value: "read+follow")
-
+        // Endpoint
         XCTAssertEqual(resource.path, "/api/v1/apps")
-        XCTAssertEqual(resource.httpMethod, .post)
 
-        XCTAssertEqual(resource.parameters!.count, 3)
-        XCTAssertTrue(resource.parameters!.contains(expectedClientName))
-        XCTAssertTrue(resource.parameters!.contains(expectedRedirectURI))
-        XCTAssertTrue(resource.parameters!.contains(expectedScopes))
+        // Method
+        XCTAssertEqual(resource.method.name, "POST")
+        XCTAssertNil(resource.method.queryItems)
+        XCTAssertNotNil(resource.method.httpBody)
 
+        let payload = String(data: resource.method.httpBody!, encoding: .utf8)!
+        XCTAssertEqual(payload.components(separatedBy: "&").count, 3)
+        XCTAssertTrue(payload.contains("client_name=MastodonKitTestApplication"))
+        XCTAssertTrue(payload.contains("redirect_uris=my-awesome-app://"))
+        XCTAssertTrue(payload.contains("scopes=read+follow"))
+
+        // Parser
         XCTAssertTrue(type(of: resource.parse) == ParserFunctionType<ClientApplication?>.self)
     }
 
     func testRegisterApplicationWithStatusAndWebsite() {
         let resource = Clients.register(clientName: "MastodonKitTestApplication", scopes: [.read, .write, .follow], website: "https://github.com/ornithocoder/MastodonKit")
 
-        let expectedClientName = URLQueryItem(name: "client_name", value: "MastodonKitTestApplication")
-        let expectedRedirectURI = URLQueryItem(name: "redirect_uris", value: "urn:ietf:wg:oauth:2.0:oob")
-        let expectedScopes = URLQueryItem(name: "scopes", value: "read+write+follow")
-        let expectedWebsite = URLQueryItem(name: "website", value: "https://github.com/ornithocoder/MastodonKit")
-
+        // Endpoint
         XCTAssertEqual(resource.path, "/api/v1/apps")
-        XCTAssertEqual(resource.httpMethod, .post)
 
-        XCTAssertEqual(resource.parameters!.count, 4)
-        XCTAssertTrue(resource.parameters!.contains(expectedClientName))
-        XCTAssertTrue(resource.parameters!.contains(expectedRedirectURI))
-        XCTAssertTrue(resource.parameters!.contains(expectedScopes))
-        XCTAssertTrue(resource.parameters!.contains(expectedWebsite))
+        // Method
+        XCTAssertEqual(resource.method.name, "POST")
+        XCTAssertNil(resource.method.queryItems)
+        XCTAssertNotNil(resource.method.httpBody)
 
+        let payload = String(data: resource.method.httpBody!, encoding: .utf8)!
+        XCTAssertEqual(payload.components(separatedBy: "&").count, 4)
+        XCTAssertTrue(payload.contains("client_name=MastodonKitTestApplication"))
+        XCTAssertTrue(payload.contains("redirect_uris=urn:ietf:wg:oauth:2.0:oob"))
+        XCTAssertTrue(payload.contains("scopes=read+write+follow"))
+        XCTAssertTrue(payload.contains("website=https://github.com/ornithocoder/MastodonKit"))
+
+        // Parser
         XCTAssertTrue(type(of: resource.parse) == ParserFunctionType<ClientApplication?>.self)
     }
 }

@@ -46,22 +46,22 @@ public struct Statuses {
     /// - Parameters:
     ///   - status: The text of the status.
     ///   - replyTo: The local ID of the status you want to reply to.
+    ///   - mediaIDs: The array of media IDs to attach to the status (maximum 4).
     ///   - sensitive: Marks the status as NSFW.
     ///   - spoilerText: the text to be shown as a warning before the actual content.
     ///   - visibility: The status' visibility.
     /// - Returns: Resource for `Status`.
-    public static func create(status: String, replyToID: Int? = nil, sensitive: Bool? = nil, spoilerText: String? = nil, visibility: Visibility = .public) -> StatusResource {
-        let dictionary: [String : String?] = [
-            "status": status,
-            "in_reply_to_id": replyToID.flatMap(toOptionalString),
-            "sensitive": sensitive.flatMap(toOptionalString),
-            "spoiler_text": spoilerText,
-            "visibility": visibility.rawValue
-        ]
+    public static func create(status: String, replyToID: Int? = nil, mediaIDs: [Int] = [], sensitive: Bool? = nil, spoilerText: String? = nil, visibility: Visibility = .public) -> StatusResource {
+        let parameters = [
+            Parameter(name: "status", value: status),
+            Parameter(name: "in_reply_to_id", value: replyToID.flatMap(toOptionalString)),
+            Parameter(name: "sensitive", value: sensitive.flatMap(nilOrTrue)),
+            Parameter(name: "spoiler_text", value: spoilerText),
+            Parameter(name: "visibility", value: visibility.rawValue)
+            ] + mediaIDs.map(toArrayOfParameters(withName: "media_ids"))
 
-        let parameters = dictionary.flatMap(toQueryItem)
-
-        return StatusResource(path: "/api/v1/statuses", parameters: parameters, method: .post, parse: StatusResource.parser)
+        let method = HTTPMethod.post(Payload.parameters(parameters))
+        return StatusResource(path: "/api/v1/statuses", method: method, parse: StatusResource.parser)
     }
 
     /// Deletes a status.
@@ -77,7 +77,7 @@ public struct Statuses {
     /// - Parameter id: The status id.
     /// - Returns: Resource for `Status`.
     public static func reblog(id: Int) -> StatusResource {
-        return StatusResource(path: "/api/v1/statuses/\(id)/reblog", method: .post, parse: StatusResource.parser)
+        return StatusResource(path: "/api/v1/statuses/\(id)/reblog", method: .post(Payload.empty), parse: StatusResource.parser)
     }
 
     /// Unreblogs a status.
@@ -85,7 +85,7 @@ public struct Statuses {
     /// - Parameter id: The status id.
     /// - Returns: Resource for `Status`.
     public static func unreblog(id: Int) -> StatusResource {
-        return StatusResource(path: "/api/v1/statuses/\(id)/unreblog", method: .post, parse: StatusResource.parser)
+        return StatusResource(path: "/api/v1/statuses/\(id)/unreblog", method: .post(Payload.empty), parse: StatusResource.parser)
     }
 
     /// Favourites a status.
@@ -93,7 +93,7 @@ public struct Statuses {
     /// - Parameter id: The status id.
     /// - Returns: Resource for `Status`.
     public static func favourite(id: Int) -> StatusResource {
-        return StatusResource(path: "/api/v1/statuses/\(id)/favourite", method: .post, parse: StatusResource.parser)
+        return StatusResource(path: "/api/v1/statuses/\(id)/favourite", method: .post(Payload.empty), parse: StatusResource.parser)
     }
 
     /// Unfavourites a status.
@@ -101,6 +101,6 @@ public struct Statuses {
     /// - Parameter id: The status id.
     /// - Returns: Resource for `Status`.
     public static func unfavourite(id: Int) -> StatusResource {
-        return StatusResource(path: "/api/v1/statuses/\(id)/unfavourite", method: .post, parse: StatusResource.parser)
+        return StatusResource(path: "/api/v1/statuses/\(id)/unfavourite", method: .post(Payload.empty), parse: StatusResource.parser)
     }
 }
