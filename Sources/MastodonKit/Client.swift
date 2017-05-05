@@ -28,25 +28,43 @@ public final class Client {
             }
 
             guard
-                let data = data,
-                let jsonObject = try? JSONSerialization.jsonObject(with: data, options: [])
+                let httpResponse = response as? HTTPURLResponse
                 else {
-                    completion(nil, ClientError.dataError)
+                    completion(nil, ClientError.unexpectedResponse)
+                    return
+            }
+            guard
+                httpResponse.statusCode == 200
+                else {
+                    //                    let mastodonError = MastodonError(json: jsonObject)
+                    completion(nil, ClientError.unsuccessfulResponse(httpResponse.statusCode))
                     return
             }
 
             guard
-                let httpResponse = response as? HTTPURLResponse,
-                httpResponse.statusCode == 200
+                let data = data
                 else {
-                    let mastodonError = MastodonError(json: jsonObject)
-                    completion(nil, ClientError.mastodonError(mastodonError.description))
+                    completion(nil, ClientError.noData)
+                    return
+            }
+            let json : Any?
+            do {
+                json = try JSONSerialization.jsonObject(with: data, options: [])
+            }
+            catch {
+                completion(nil, ClientError.dataSerializationError(error))
+                return
+            }
+            guard
+                let jsonObject = json
+                else {
+                    completion(nil, ClientError.noData)
                     return
             }
 
             completion(resource.parse(jsonObject), nil)
         }
-
+        
         task.resume()
     }
 }
