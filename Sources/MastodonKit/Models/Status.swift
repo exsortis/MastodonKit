@@ -39,6 +39,12 @@ public struct Status {
     public let tags: [Tag]
     /// Application from which the status was posted.
     public let application: Application?
+    /// The reblogged Status
+    public var reblog: Status? {
+        return reblogWrapper.first?.flatMap { $0 }
+    }
+
+    var reblogWrapper: [Status?]
 }
 
 extension Status {
@@ -79,6 +85,7 @@ extension Status {
         self.sensitive = dictionary["sensitive"] as? Bool
         self.spoilerText = spoilerText
         self.visibility = Visibility(string: visibilityString)
+        self.reblogWrapper = [dictionary["reblog"].flatMap(asJSONDictionary).flatMap(Status.init)]
         self.application = dictionary["application"].flatMap(asJSONDictionary).flatMap(Application.init)
         self.mediaAttachments = attachmentsArray.flatMap(Attachment.init)
         self.mentions = mentionsArray.flatMap(Mention.init)

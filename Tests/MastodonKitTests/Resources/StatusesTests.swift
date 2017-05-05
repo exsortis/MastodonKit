@@ -62,6 +62,25 @@ class StatusesTests: XCTestCase {
         XCTAssertTrue(type(of: resource.parse) == ParserFunctionType<[Account]?>.self)
     }
 
+    func testRebloggedByWithRange() {
+        let resource = Statuses.rebloggedBy(id: 42, range: .since(id: 12, limit: 50))
+        let expectedSinceID = URLQueryItem(name: "since_id", value: "12")
+        let expectedLimit = URLQueryItem(name: "limit", value: "50")
+
+        // Endpoint
+        XCTAssertEqual(resource.path, "/api/v1/statuses/42/reblogged_by")
+
+        // Method
+        XCTAssertEqual(resource.method.name, "GET")
+        XCTAssertNil(resource.method.httpBody)
+        XCTAssertEqual(resource.method.queryItems?.count, 2)
+        XCTAssertTrue(resource.method.queryItems!.contains(expectedSinceID))
+        XCTAssertTrue(resource.method.queryItems!.contains(expectedLimit))
+
+        // Parser
+        XCTAssertTrue(type(of: resource.parse) == ParserFunctionType<[Account]?>.self)
+    }
+
     func testFavouritedBy() {
         let resource = Statuses.favouritedBy(id: 42)
 
@@ -72,6 +91,25 @@ class StatusesTests: XCTestCase {
         XCTAssertEqual(resource.method.name, "GET")
         XCTAssertNil(resource.method.httpBody)
         XCTAssertNil(resource.method.queryItems)
+
+        // Parser
+        XCTAssertTrue(type(of: resource.parse) == ParserFunctionType<[Account]?>.self)
+    }
+
+    func testFavouritedByWithRange() {
+        let resource = Statuses.favouritedBy(id: 42, range: .since(id: 12, limit: 50))
+        let expectedSinceID = URLQueryItem(name: "since_id", value: "12")
+        let expectedLimit = URLQueryItem(name: "limit", value: "50")
+
+        // Endpoint
+        XCTAssertEqual(resource.path, "/api/v1/statuses/42/favourited_by")
+
+        // Method
+        XCTAssertEqual(resource.method.name, "GET")
+        XCTAssertNil(resource.method.httpBody)
+        XCTAssertEqual(resource.method.queryItems?.count, 2)
+        XCTAssertTrue(resource.method.queryItems!.contains(expectedSinceID))
+        XCTAssertTrue(resource.method.queryItems!.contains(expectedLimit))
 
         // Parser
         XCTAssertTrue(type(of: resource.parse) == ParserFunctionType<[Account]?>.self)
@@ -90,7 +128,7 @@ class StatusesTests: XCTestCase {
 
         let payload = String(data: resource.method.httpBody!, encoding: .utf8)!
         XCTAssertEqual(payload.components(separatedBy: "&").count, 2)
-        XCTAssertTrue(payload.contains("status=The most awesome status message ever!"))
+        XCTAssertTrue(payload.contains("status=The%20most%20awesome%20status%20message%20ever%21"))
         XCTAssertTrue(payload.contains("visibility=public"))
 
         // Parser
@@ -110,7 +148,7 @@ class StatusesTests: XCTestCase {
 
         let payload = String(data: resource.method.httpBody!, encoding: .utf8)!
         XCTAssertEqual(payload.components(separatedBy: "&").count, 3)
-        XCTAssertTrue(payload.contains("status=The most awesome status message ever!"))
+        XCTAssertTrue(payload.contains("status=The%20most%20awesome%20status%20message%20ever%21"))
         XCTAssertTrue(payload.contains("in_reply_to_id=42"))
         XCTAssertTrue(payload.contains("visibility=public"))
 
@@ -131,7 +169,7 @@ class StatusesTests: XCTestCase {
 
         let payload = String(data: resource.method.httpBody!, encoding: .utf8)!
         XCTAssertEqual(payload.components(separatedBy: "&").count, 5)
-        XCTAssertTrue(payload.contains("status=The most awesome status message ever!"))
+        XCTAssertTrue(payload.contains("status=The%20most%20awesome%20status%20message%20ever%21"))
         XCTAssertTrue(payload.contains("visibility=public"))
         XCTAssertTrue(payload.contains("media_ids[]=1"))
         XCTAssertTrue(payload.contains("media_ids[]=2"))
@@ -154,7 +192,7 @@ class StatusesTests: XCTestCase {
 
         let payload = String(data: resource.method.httpBody!, encoding: .utf8)!
         XCTAssertEqual(payload.components(separatedBy: "&").count, 3)
-        XCTAssertTrue(payload.contains("status=The most awesome status message ever!"))
+        XCTAssertTrue(payload.contains("status=The%20most%20awesome%20status%20message%20ever%21"))
         XCTAssertTrue(payload.contains("sensitive=true"))
         XCTAssertTrue(payload.contains("visibility=public"))
 
@@ -175,8 +213,8 @@ class StatusesTests: XCTestCase {
 
         let payload = String(data: resource.method.httpBody!, encoding: .utf8)!
         XCTAssertEqual(payload.components(separatedBy: "&").count, 3)
-        XCTAssertTrue(payload.contains("status=Can't believe it's an amusement park like Westworld!"))
-        XCTAssertTrue(payload.contains("spoiler_text=Last night's GoT!!!"))
+        XCTAssertTrue(payload.contains("status=Can%27t%20believe%20it%27s%20an%20amusement%20park%20like%20Westworld%21"))
+        XCTAssertTrue(payload.contains("spoiler_text=Last%20night%27s%20GoT%21%21%21"))
         XCTAssertTrue(payload.contains("visibility=public"))
 
         // Parser
@@ -196,7 +234,7 @@ class StatusesTests: XCTestCase {
 
         let payload = String(data: resource.method.httpBody!, encoding: .utf8)!
         XCTAssertEqual(payload.components(separatedBy: "&").count, 2)
-        XCTAssertTrue(payload.contains("status=The most awesome status message ever!"))
+        XCTAssertTrue(payload.contains("status=The%20most%20awesome%20status%20message%20ever%21"))
         XCTAssertTrue(payload.contains("visibility=unlisted"))
 
         // Parser
