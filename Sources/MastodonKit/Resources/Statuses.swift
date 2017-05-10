@@ -27,7 +27,9 @@ public struct Statuses {
 
     /// Gets who reblogged a status.
     ///
-    /// - Parameter id: The status id.
+    /// - Parameters:
+    ///   - id: The status id.
+    ///   - range: The bounds used when requesting data from Mastodon.
     /// - Returns: Resource for `[Account]`.
     public static func rebloggedBy(id: Int, range: ResourceRange = .default) -> AccountsResource {
         let parameters = range.parameters(limit: between(1, and: 80, fallback: 40))
@@ -38,7 +40,9 @@ public struct Statuses {
 
     /// Gets who favourited a status.
     ///
-    /// - Parameter id: The status id.
+    /// - Parameters:
+    ///   - id: The status id.
+    ///   - range: The bounds used when requesting data from Mastodon.
     /// - Returns: Resource for `[Account]`.
     public static func favouritedBy(id: Int, range: ResourceRange = .default) -> AccountsResource {
         let parameters = range.parameters(limit: between(1, and: 80, fallback: 40))
@@ -83,7 +87,7 @@ public struct Statuses {
     /// - Parameter id: The status id.
     /// - Returns: Resource for `Status`.
     public static func reblog(id: Int) -> StatusResource {
-        return StatusResource(path: "/api/v1/statuses/\(id)/reblog", method: .post(Payload.empty), parse: StatusResource.parser)
+        return StatusResource(path: "/api/v1/statuses/\(id)/reblog", method: .post(.empty), parse: StatusResource.parser)
     }
 
     /// Unreblogs a status.
@@ -91,7 +95,7 @@ public struct Statuses {
     /// - Parameter id: The status id.
     /// - Returns: Resource for `Status`.
     public static func unreblog(id: Int) -> StatusResource {
-        return StatusResource(path: "/api/v1/statuses/\(id)/unreblog", method: .post(Payload.empty), parse: StatusResource.parser)
+        return StatusResource(path: "/api/v1/statuses/\(id)/unreblog", method: .post(.empty), parse: StatusResource.parser)
     }
 
     /// Favourites a status.
@@ -99,7 +103,7 @@ public struct Statuses {
     /// - Parameter id: The status id.
     /// - Returns: Resource for `Status`.
     public static func favourite(id: Int) -> StatusResource {
-        return StatusResource(path: "/api/v1/statuses/\(id)/favourite", method: .post(Payload.empty), parse: StatusResource.parser)
+        return StatusResource(path: "/api/v1/statuses/\(id)/favourite", method: .post(.empty), parse: StatusResource.parser)
     }
 
     /// Unfavourites a status.
@@ -107,6 +111,6 @@ public struct Statuses {
     /// - Parameter id: The status id.
     /// - Returns: Resource for `Status`.
     public static func unfavourite(id: Int) -> StatusResource {
-        return StatusResource(path: "/api/v1/statuses/\(id)/unfavourite", method: .post(Payload.empty), parse: StatusResource.parser)
+        return StatusResource(path: "/api/v1/statuses/\(id)/unfavourite", method: .post(.empty), parse: StatusResource.parser)
     }
 }

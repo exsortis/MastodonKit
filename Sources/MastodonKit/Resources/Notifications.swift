@@ -3,6 +3,7 @@ import Foundation
 public struct Notifications {
     /// Fetches a user's notifications.
     ///
+    /// - Parameter range: The bounds used when requesting data from Mastodon.
     /// - Returns: Resource for `[Notification]`.
     public static func all(range: ResourceRange = .default) -> NotificationsResource {
         let parameters = range.parameters(limit: between(1, and: 15, fallback: 30))
@@ -23,7 +24,7 @@ public struct Notifications {
     ///
     /// - Returns: Resource for `Notification`.
     public static func dismissAll() -> NotificationResource {
-        return NotificationResource(path: "/api/v1/notifications/clear", method: .post(Payload.empty), parse: NotificationResource.parser)
+        return NotificationResource(path: "/api/v1/notifications/clear", method: .post(.empty), parse: NotificationResource.parser)
     }
 
     /// Deletes a single notification for the authenticated user.
@@ -31,6 +32,6 @@ public struct Notifications {
     /// - Parameter id: The notification id.
     /// - Returns: Resource for `Notification`.
     public static func dismiss(id: Int) -> NotificationResource {
-        return NotificationResource(path: "/api/v1/notifications/dismiss/\(id)", method: .post(Payload.empty), parse: NotificationResource.parser)
+        return NotificationResource(path: "/api/v1/notifications/dismiss/\(id)", method: .post(.empty), parse: NotificationResource.parser)
     }
 }
